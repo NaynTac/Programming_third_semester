@@ -1,0 +1,45 @@
+import timeit
+import random
+import matplotlib.pyplot as plt
+
+
+def fact_recursive(n):
+
+	if n < 2:
+		return 1
+
+	return fact_recursive(n - 1) * n
+
+
+def fact_iterative(n):
+
+	result = 1
+
+	for num in range(1, n + 1):
+		result *= num
+
+	return result
+
+
+def benchmark(func, data, number, repeat):
+
+	times = timeit.repeat(lambda: func(n), number=number, repeat=repeat)
+	return min(times)
+
+
+data = list(range(10, 150, 5))
+
+res_recursive = []
+res_iterative = []
+
+for n in data:
+	res_recursive.append(benchmark(fact_recursive, n, 1000, 5))
+	res_iterative.append(benchmark(fact_iterative, n, 1000, 5))
+
+plt.plot(data, res_recursive, label="Рекурсивный")
+plt.plot(data, res_iterative, label="Итеративный")
+plt.xlabel("n")
+plt.ylabel("Время (сек)")
+plt.title("Сравнение рекурсивного и итеративного факториала")
+plt.legend()
+plt.show()
