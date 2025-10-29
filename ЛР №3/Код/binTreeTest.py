@@ -25,5 +25,11 @@ if __name__ == "__main__":
         def test_6(self):
             self.assertEqual(gen_bin_tree(3, 6), {6: ({9: ({13.5: (20.25, 182.25)}, {81: (121.5, 6561)})},
             {36: ({54: (81, 2916)}, {1296: (1944, 1679616)})})})
+
+        def test_zero(self):
+            self.assertEqual(gen_bin_tree(0), 8)
+
+        def test_neg(self):
+            self.assertEqual(gen_bin_tree(-1), None)
         
     unittest.main()

@@ -6,21 +6,30 @@ ___
 
 **Код**:
 ```python
-def gen_bin_tree(height, root):
-    """
-    Возвращаем словарь с ключом, равным корню, и со значением,
-    равным кортежу из левого и правого значений
+def gen_bin_tree(height=4, root=8, right_leaf=lambda x: x * x, left_leaf=lambda x: x + x / 2):
+    # При высоте, равной нулю, выводим только корень бинарного дерева
+    if height == 0:
+        return (root)
+
+    # При отрицательной высоте дерева не существует => ничего не возвращаем
+    if height < 0:
+        return None
     
-    Возвращаем рекурсивно до тех пор, пока высота дерева больше 1.
-    Как только цикл завершится, возвращаем последнюю пару значений дерева
-    """
+    # Выполняем цикл ниже до тех пор, пока не получим "поддерево" высотой 1
     while height > 1:
-        left_leaf = root + root/2
-        right_leaf = root**2
-        return {root: (gen_bin_tree(height - 1, left_leaf), gen_bin_tree(height - 1, right_leaf))}
+        # Находим значения листьев и записываем их в переменные
+        left = left_leaf(root)
+        right = right_leaf(root)
+        # Возвращаем словарь, ключом в котором является корень, а значением – кортеж листьев
+        # Листья в кортеже представляют из себя результаты работы функции при меньшей высоте
+        return {root: (gen_bin_tree(height - 1, left), gen_bin_tree(height - 1, right))}
         
+    # Возвращаем последнее "поддерево", если цикл не будет запущен
+    # Высота последнего поддерева равна 1
     return {root: (root + root/2, root**2)}
 
+
+print(gen_bin_tree())
 
 """
 Получившееся бинарное дерево при значениях gen_bin_tree(4, 8):
@@ -95,14 +104,20 @@ if __name__ == "__main__":
         def test_6(self):
             self.assertEqual(gen_bin_tree(3, 6), {6: ({9: ({13.5: (20.25, 182.25)}, {81: (121.5, 6561)})},
             {36: ({54: (81, 2916)}, {1296: (1944, 1679616)})})})
+
+        def test_zero(self):
+            self.assertEqual(gen_bin_tree(0), 8)
+
+        def test_neg(self):
+            self.assertEqual(gen_bin_tree(-1), None)
         
     unittest.main()
 ```
 **Результат тестов**:
 ```
-......
+........
 ----------------------------------------------------------------------
-Ran 6 tests in 0.008s
+Ran 8 tests in 0.000s
 
 OK
 ```
