@@ -6,6 +6,8 @@ ___
 
 **Код**:
 ```python
+# Функция gen_bin_tree() принимает на вход 4 аргумента: 2 типа int и два типа function <lambda>
+# height отвечает за высоту дерева, root – за корень дерева, right_leaf и left_leaf – за значение листьев дерева
 def gen_bin_tree(height=4, root=8, right_leaf=lambda x: x * x, left_leaf=lambda x: x + x / 2):
     # При высоте, равной нулю, выводим только корень бинарного дерева
     if height == 0:
@@ -21,10 +23,10 @@ def gen_bin_tree(height=4, root=8, right_leaf=lambda x: x * x, left_leaf=lambda 
         left = left_leaf(root)
         right = right_leaf(root)
         # Возвращаем словарь, ключом в котором является корень, а значением – кортеж листьев
-        # Листья в кортеже представляют из себя результаты работы функции при меньшей высоте
+        # Листья в кортеже представляют из себя результаты работы функции при меньшей на 1 высоте
         return {root: (gen_bin_tree(height - 1, left), gen_bin_tree(height - 1, right))}
         
-    # Возвращаем последнее "поддерево", если цикл не будет запущен
+    # Возвращаем последнее "поддерево", если не попадепм в цикл
     # Высота последнего поддерева равна 1
     return {root: (root + root/2, root**2)}
 
