@@ -5,4 +5,4 @@ def find_index(nums, target):
             return [i, j + 1]
         except:
             continue
-    return -1   # Если пара не найдется, возвращаем -1
+    return -1   # Если пара не найдется, возвращаем -1  
