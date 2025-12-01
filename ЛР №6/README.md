@@ -4,64 +4,72 @@ ___
 
 **Код**:
 ```python
+from functools import wraps
 import requests
 import logging
 import sys
 
-# Определяем логгер
-logging.getLogger("mainLogger")
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Создаем декоратор, который будет формировать лог
-def log(func):
 
-    def get_curr(*args):
+def trace(func=None, handle=sys.stdout):
+    if not func:
+        return lambda func: trace(func, handle=handle)
+    else:
+        print(f"{func.__name__}, {handle}")
 
-        logger.info("Getting request")
+    @wraps(func)
+    def inner(*args, **kwargs):
 
         try:
-            result = func(*args)
-            logger.info("Successfully")
-            return result
-        # Обработка исключений
-        except requests.exceptions.HTTPError as ex: logger.error(f"{str(ex)}")
-        except requests.exceptions.InvalidSchema as ex: logger.error(f"{str(ex)}")
-        except requests.exceptions.ConnectionError: logger.error(f"Connection Error")
-        except requests.exceptions.InvalidURL: logger.error(f"Invalid URL")
-        except KeyError as ex: logger.error(f"Currency key not defined ({str(ex)})")
+            return func(*args, **kwargs)
 
-    return get_curr
+        except requests.exceptions.RequestException as exc:
 
+            if handle == sys.stdout:
+                handle.write(f"Ошибка при запросе к API: {exc}")
+            elif handle == logging.getLogger(__name__):
+                handle.error(f"Ошибка при запросе к API: {exc}")
 
-@log
-def get_currencies(currency_codes, url):
-    # Обращение по url
-    req = requests.get(url)
-    # Если обращение было неудачным, то бросаем исключение
-    if req.status_code != 200: req.raise_for_status()
-    # Забираем данные
-    data = req.json()["Valute"]
-    result = dict()
-    # Добавляем нужные данные в итоговый словарь
-    for code in currency_codes:
-        result[code] = data[code]["Value"]
+            raise requests.exceptions.RequestException("Упали с исключением")
 
-    return result
+    return inner
 
 
-if __name__ == "__main__":
-    get_currencies(["USD"], "https://www.cbr-xml-daily.ru/daily_json.js")
+@trace
+def get_currencies(currency_codes:list, url:str="https://www.cbr-xml-daily.ru/daily_json.js") -> dict:
+    """
+    Получает курс валют API Центробанка России
+
+    Args:
+        currency_codes (list): Список символьных кодов валют (Например, ["USD", "EUR"])
+
+    Returns:
+        dict: Словарь вида {символьный код валюты: курс валюты, }
+            В случае ошибки запроса возвращает None
+    """
+    response = requests.get(url)
+    response.raise_for_status()
+
+    data = response.json()
+    currencies = dict()
+
+    if "Valute" in data:
+        for code in currency_codes:
+            if code in data["Valute"]:
+                currencies[code] = data["Valute"][code]["Value"]
+            else:
+                currencies[code] = f"Код валюты '{code}' не найден."
+
+    return currencies
 ```
 ___
 **Тесты функции**:
 ```python
-from get_curr_function import get_currencies
+from get_currencies import get_currencies
 import requests
-
-url = "https://www.cbr-xml-daily.ru/daily_json.js"
-req = requests.get(url)
-data = req.json()["Valute"]
 
 
 if __name__ == "__main__":
@@ -70,35 +78,38 @@ if __name__ == "__main__":
     
     class TestFunction(unittest.TestCase):
         
-        def test_1(self):
-            self.assertEqual(get_currencies(["USD"], url), {"USD": data["USD"]["Value"]})
-            
-        def test_2(self):
-            self.assertEqual(get_currencies(["AUD"], url), {"AUD": data["AUD"]["Value"]})
-            
-        def test_3(self):
-            self.assertEqual(get_currencies(["AZN", "DZD"], url),
-                {"AZN": data["AZN"]["Value"], "DZD": data["DZD"]["Value"]})
+        def test_currency_eur(self):
+            """
+            Проверяет наличие ключа в словаре и значения этого ключа
+            """
+            currency_data = get_currencies(["EUR"])
 
-        def test_4(self):
-            self.assertEqual(get_currencies(["AZN", "RUT"], url), None)
+            self.assertIn("EUR", currency_data)
+            self.assertIsInstance(currency_data["EUR"], float)
+            self.assertGreaterEqual(currency_data["EUR"], 0)
 
-    unittest.main()
+        def test_nonexist_code(self):
+            self.assertIn("не найден", get_currencies(["AAA"])["AAA"])
+
+        def test_error(self):
+            error_phrase = "Ошибка при запросе к API"
+            currency_list = ["EUR"]
+
+            with self.assertRaises(requests.exceptions.RequestException):
+                currency_data = get_currencies(currency_list, url="https://jjfjj.js")
+
+    unittest.main(argv=[''], verbosity=2, exit=False)
 ```
 **Результат тестов**:
 ```
-INFO:get_curr_function:Getting request
-INFO:get_curr_function:Successfully
-.INFO:get_curr_function:Getting request
-INFO:get_curr_function:Successfully
-.INFO:get_curr_function:Getting request
-INFO:get_curr_function:Successfully
-.INFO:get_curr_function:Getting request
-ERROR:get_curr_function:Currency key not defined ('RUT')
-.
+get_currencies, <_io.TextIOWrapper name='<stdout>' mode='w' encoding='utf-8'>
+test_currency_eur (__main__.TestFunction.test_currency_eur)
+Проверяет наличие ключа в словаре и значения этого ключа ... ok
+test_error (__main__.TestFunction.test_error) ... Ошибка при запросе к API: HTTPSConnectionPool(host='jjfjj.js', port=443): Max retries exceeded with url: / (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001C729651590>: Failed to resolve 'jjfjj.js' ([Errno 11001] getaddrinfo failed)"))ok
+test_nonexist_code (__main__.TestFunction.test_nonexist_code) ... ok
+
 ----------------------------------------------------------------------
-Ran 4 tests in 1.352s
+Ran 3 tests in 1.073s
 
 OK
-[Finished in 2.0s]
 ```
