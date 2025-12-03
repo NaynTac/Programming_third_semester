@@ -2,6 +2,7 @@ from functools import wraps
 import requests
 import logging
 import sys
+import io
 
 
 logging.basicConfig(level=logging.INFO)

@@ -1,4 +1,6 @@
 from get_currencies import get_currencies
+from unittest.mock import patch
+from io import StringIO
 import requests
 
 
@@ -27,5 +29,6 @@ if __name__ == "__main__":
 
             with self.assertRaises(requests.exceptions.RequestException):
                 currency_data = get_currencies(currency_list, url="https://jjfjj.js")
+
 
     unittest.main(argv=[''], verbosity=2, exit=False)

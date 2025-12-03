@@ -1,0 +1,27 @@
+class Author():
+
+	def __init__(self, name, group):
+		self.__name = name
+		self.__group = group
+
+	@property
+	def name(self):
+		return self.__name
+
+	@name.setter
+	def name(self, name):
+		if isinstance(name, str) and len(name) > 2:
+			self.__name = name
+		else:
+			raise ValueError("Ошибка при задании имени автора")
+
+	@property
+	def group(self):
+		return self.__group
+
+	@group.setter
+	def group(self, group):
+		if isinstance(group, str) and len(group) > 5:
+			self.__group = group
+		else:
+			raise ValueError("Ошибка при задании группы автора")
