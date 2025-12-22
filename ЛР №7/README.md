@@ -295,15 +295,15 @@ for i in range(len(currencies_list)):
 ___
 ### Пример работы приложения
 **/:**
-![](.img/index.png)
+![](./img/index.png)
 **/users:**
-![](.img/users.png)
+![](./img/users.png)
 **/currencies:**
-![](.img/currencies.png)
+![](./img/currencies.png)
 **/author:**
-![](.img/author.png)
+![](./img/author.png)
 **/user?id=1:**
-![](.img/user_id_1.png)
+![](./img/user_id_1.png)
 ___
 ### Тестирование
 Для тестирования был использован фреймворк `pytest`. Для тестирования геттеров, сеттеров, исключений и функций также была использована параметризация
