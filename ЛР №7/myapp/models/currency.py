@@ -18,7 +18,7 @@ class Currency():
 	
 	@num_code.setter
 	def num_code(self, num_code):
-		if isinstance(str, num_code) and len(num_code) == 3:
+		if isinstance(num_code, str) and len(num_code) == 3:
 			self.__num_code = num_code
 		else:
 			raise ValueError("Ошибка при задании цифрового кода валюты")
@@ -29,7 +29,7 @@ class Currency():
 	
 	@char_code.setter
 	def char_code(self, char_code):
-		if isinstance(str, char_code) and len(char_code) == 3:
+		if isinstance(char_code, str) and len(char_code) == 3:
 			self.__char_code = char_code
 		else:
 			raise ValueError("Ошибка при задании символьного кода валюты")
@@ -40,7 +40,7 @@ class Currency():
 	
 	@name.setter
 	def name(self, name):
-		if isinstance(str, name) and name:
+		if isinstance(name, str) and name:
 			self.__name = name
 		else:
 			raise ValueError("Ошибка при задании названия валюты")
@@ -51,7 +51,7 @@ class Currency():
 	
 	@value.setter
 	def value(self, value):
-		if isinstance(float, value) and value > 0:
+		if isinstance(value, float) and value > 0:
 			self.__value = value
 		else:
 			raise ValueError("Ошибка при задании курса валюты")
@@ -62,7 +62,7 @@ class Currency():
 	
 	@nominal.setter
 	def nominal(self, nominal):
-		if isinstance(int, nominal) and nominal > 0:
+		if isinstance(nominal, int) and nominal > 0:
 			self.__nominal = nominal
 		else:
 			raise ValueError("Ошибка при задании номинала валюты")

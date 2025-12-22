@@ -1,15 +1,10 @@
-from models import Author
-from models import App
-from models import User
-from models import Currency
-from models import UserCurrency
+from models import *
 
 from utils.currencies_api import get_currencies
 
 import http.server
 import urllib.parse
 from jinja2 import Environment, PackageLoader, select_autoescape
-
 
 env = Environment( loader=PackageLoader("myapp"), autoescape=select_autoescape())
 
@@ -21,7 +16,8 @@ template_user_id = env.get_template("user_id.html")
 
 
 main_author = Author(name="Пименов Егор", group="2об_ИВТ-2/24")
-main_app = App("myapp", "1.0.0", main_author)
+main_app = App("myapp", "1.0.0", None)
+
 
 users_list = list()
 currencies_list = list()
@@ -76,6 +72,7 @@ class CustomHandler(http.server.BaseHTTPRequestHandler):
 		self.send_response(200)
 		self.send_header("Content-type", "text/html")
 		self.end_headers()
+
 		if "?id=" in self.path:
 			parsed_data = urllib.parse.parse_qs(self.path, separator="?")
 			user_id = int(parsed_data["id"][0])
@@ -89,7 +86,8 @@ class CustomHandler(http.server.BaseHTTPRequestHandler):
 			)
 
 			self.wfile.write(bytes(user_id_content.encode("utf-8")))
-		else:
+
+		elif self.path in templates:
 			self.wfile.write(bytes(templates[self.path].encode("utf-8")))
 
 

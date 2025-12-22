@@ -14,7 +14,7 @@ class User():
 	
 	@name.setter
 	def name(self, name):
-		if isinstance(str, name) and len(name) > 2:
+		if isinstance(name, str) and len(name) > 2:
 			self.__name = name
 		else:
 			raise ValueError("Ошибка при задании имени пользователя")

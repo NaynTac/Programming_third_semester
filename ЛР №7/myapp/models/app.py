@@ -1,3 +1,6 @@
+from .author import Author
+
+
 class App():
 
 	def __init__(self, name, version, author):
@@ -37,5 +40,3 @@ class App():
 			self.__author = author
 		else:
 			raise ValueError("Ошибка при задании автора приложения")
-	
-	
